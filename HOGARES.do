@@ -4,31 +4,12 @@ cd "G:\2024\PLANEAMIENTO Y PROSPECTIVA\06. PROYECTOS\09. Situación Habitacional
 
 
 //     Importar bases de datos 
-//     MODULO 100 - 2021 
+//     MODULO 100 - 2019
 
 unicode analyze "enaho01-2019-100.dta" 
-unicode encoding set "latin1"
+unicode encoding set "latin1"  # Correcta lectura de "ñ" y las tíldes
 unicode translate "enaho01-2019-100.dta" 
 use "enaho01-2019-100.dta"
-
-
-
-gen FUENTE_CREDITO = 0
-forvalue x= 1/10 {
-	if `x'==5{
-			continue
-			}	
-	replace FUENTE_CREDITO = `x' if p107c1`x'==`x'| p107c2`x'==`x' | p107c3`x'==`x'| p107c4`x'==`x'
-	replace FUENTE_CREDITO =. if p107c1`x'==. & p107c2`x'==. & p107c3`x'==. & p107c4`x'==.
-}
-
-* etiquetas de categorías
-label var FUENTE_CREDITO fuentes_fin
-label define fuentes_fin 1 "Banco privado" 2 "Banco de la Nación" 3 "Caja Municipal" 4 "Persona Particular" 6 "Techo Propio" 7 "Financiera de Ahorro y Crédito" 8 "Otros" 9 "Cooperativa de ahorro y crédito" 10 "Derrama Magisterial"
-label values FUENTE_CREDITO fuentes_fin
-
-tab FUENTE_CREDITO [iw=factor07]
-
 
 
 
@@ -44,7 +25,7 @@ drop duplicado
 egen idvivienda = concat(conglome vivienda)
 
 
-* DEPARTAMENTOS
+* DEPARTAMENTOS *
 gen str2 DEPARTAMENTOS=substr(ubigeo, 1, 2)
 destring DEPARTAMENTOS, replace
 
@@ -52,12 +33,12 @@ label define dptos 1 "Amazonas" 2 "Ancash" 3 "Apurímac" 4 "Arequipa" 5 "Ayacuch
 label values DEPARTAMENTOS dptos
 tab DEPARTAMENTOS
 
-* REGIONES NATURALES
+* REGIONES NATURALES *
 recode dominio (1 2 3 8=1 "Costa") (4 5 6=2 "sierra") (7=3 "selva"), gen (REGION_NATURAL) 
 label var REGION_NATURAL "Región Natural"
 tab REGION_NATURAL
 
-* AREA
+* ÁREA * Siguiendo en linea al INEI
 tab estrato 
 gen AREA=1 if estrato<=5
 replace AREA=2 if estrato==6 | estrato==7 | estrato==8
@@ -146,12 +127,12 @@ tab COMBUSTIBLE_PARA_COCINA [iw=factor07]
 
 
 * Obtención de crédito hipotecario
-gen ACCESO_FIN = 0
+gen ACCESO_FIN = 0 // sin discriminar su uso (Mejoramiento o ampliación o compra) 
 replace ACCESO_FIN = 1 if p107b1==1 | p107b2==1 | p107b3==1 | p107b4==1
 replace ACCESO_FIN = . if p107b1==. & p107b2==. & p107b3==. & p107b4==.
 	
 la var ACCESO_FIN "credito" 
-label define credito 0 "no" 1 "si"
+label define credito 0 "No" 1 "Sí"
 la values ACCESO_FIN credito
 
 tab ACCESO_FIN [iw=factor07]
@@ -181,8 +162,31 @@ tab DIFICULTADES_PAGO_CREDITO [iw=factor07]
 
 // FUENTE DEL FINANCIAMIENTO
 //-----------------------------------------------------------------------------
-	
-//FUENTES
+
+/* VARIABLE DEJADA DE LADO
+* No adecuado en este caso, ya que los hogares no tienen una sola fuente de crédito 
+
+gen FUENTE_CREDITO = 0
+forvalue x= 1/10 {
+	if `x'==5{
+			continue
+			}	
+	replace FUENTE_CREDITO = `x' if p107c1`x'==`x'| p107c2`x'==`x' | p107c3`x'==`x'| p107c4`x'==`x'
+	replace FUENTE_CREDITO =. if p107c1`x'==. & p107c2`x'==. & p107c3`x'==. & p107c4`x'==.
+}
+
+label var FUENTE_CREDITO fuentes_fin // etiquetas de categorías
+label define fuentes_fin 1 "Banco privado" 2 "Banco de la Nación" 3 "Caja Municipal" 4 "Persona Particular" 6 "Techo Propio" 7 "Financiera de Ahorro y Crédito" 8 "Otros" 9 "Cooperativa de ahorro y crédito" 10 "Derrama Magisterial"
+label values FUENTE_CREDITO fuentes_fin
+
+tab FUENTE_CREDITO [iw=factor07]
+
+*/
+
+
+//VARIABLES DICOTÓMICAS : FUENTES 
+* Identificamos la fuente para cada tipo de uso para no dejar de lado ninguna información
+
 forvalues n=1/10 {
 	if `n'==5{
 	continue
@@ -211,22 +215,18 @@ rename nbi5 ALTA_DEPEND_ECON
 
 
 
+//  Exportación a CSV
+// ______________________________________________
 
-
-
-
-
-
-
-
-// AÑO
+* AÑO
 gen AÑO = 2019
 
-*Verificando que no haya hogares duplicados
+* Verificando que no haya hogares duplicados
 duplicates tag idhogar , gen (duplicado)
 tab duplicado
 drop duplicado
 
+* Obs
 tab result
 drop if result==3 | result==4 | result==5 | result==7
 
