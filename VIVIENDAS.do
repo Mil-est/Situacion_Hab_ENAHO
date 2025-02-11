@@ -3,8 +3,9 @@ cls
 cd "G:\2024\PLANEAMIENTO Y PROSPECTIVA\06. PROYECTOS\09. Situación Habitacional\ADICIONES - copia"
 
 
+// Importación de bases
+//     MODULO 100
 
-//     MODULO 100 
 unicode analyze "enaho01-2023-100.dta" 
 unicode encoding set "latin1"
 unicode translate "enaho01-2023-100.dta" 
@@ -89,13 +90,13 @@ tab N_HABITACIONES [iw=factor07]
 
 
 // VIVIENDAS CON LICENCIA DE CONSTRUCCIÓN
-
+//---------------------------------------
 rename p104b1 LICENCIA_DE_CONSTRUCCION
 tab LICENCIA_DE_CONSTRUCCION [iw=factor07]
 
 
 //VIVIENDAS CONSTRUIDAS CON ASISTENCIA TÉCNICA
-
+//---------------------------------------
 rename p104b2 ASISTENCIA_TECNICA
 tab ASISTENCIA_TECNICA [iw=factor07]
 
@@ -109,19 +110,19 @@ tab ASISTENCIA_TECNICA [iw=factor07]
 
 
 // MATERIAL EN LAS PAREDES
-
+//---------------------------------------
 rename p102 MATERIAL_PAREDES
 tab MATERIAL_PAREDES [iw=factor07]
 
 
 // MATERIAL EN LOS PISOS
-
+//---------------------------------------
 rename p103 MATERIAL_PISOS
 tab MATERIAL_PISOS [iw=factor07]
 
 
 // MATERIAL EN LOS TECHOS
-
+//---------------------------------------
 rename p103a MATERIAL_TECHOS
 tab MATERIAL_TECHOS [iw=factor07]
 
@@ -176,25 +177,23 @@ rename nbi2 NBI2_HACINAMIENTO
 
 
 
+// Exportación de datos CSV
+//____________________________________
 
 
-
-
-
-
-
-// AÑO
+* AÑO
 gen AÑO = 2023
+
 duplicates tag idviv , gen (duplicado)
 tab duplicado
 drop duplicado
 
-
+* Obs
 tab result
 drop if result==3 | result==4 | result==5 | result==7
 
 
-// Limpiando base
+// Variables de interés
 keep conglome vivienda idviv ubigeo dominio AREA REGION_NATURAL DEPARTAMENTOS AÑO factor07 TIPO_VIVIENDA N_HABITACIONES LICENCIA_DE_CONSTRUCCION ASISTENCIA_TECNICA MATERIAL_PAREDES  MATERIAL_PISOS MATERIAL_TECHOS REGIMEN_TENENCIA_VIV TITULO_DE_PROPIEDAD TITULO_REGISTRADO_SUNARP ALUMBRADO_ELECTRICO PROCEDENCIA_SERVICIO_AGUA ACCESO_ALCANTARILLADO COMBUSTIBLE_PARA_COCINA NBI1_VIVIENDAS NBI2_HACINAMIENTO
 
 
