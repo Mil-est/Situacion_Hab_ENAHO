@@ -3,6 +3,9 @@ Situación Habitacional Perú 2019-2023 que realicé para un proyecto del Fondo 
 
 Fuente de datos: https://proyectos.inei.gob.pe/microdatos/
 
+Uso de STATA para el proceso ETL: Los do muestran la obtención de bases que se cargaran en el Power BI
+
+
 Este reporte cuenta con dos secciones:
 * Análisis
 * Evolución
